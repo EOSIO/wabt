@@ -117,11 +117,11 @@ else ()
     add_definitions(-D_POSIX)
   endif ()
 
-  if (COMPILER_IS_GNU)
-    # disable -Wclobbered: it seems to be guessing incorrectly about a local
-    # variable being clobbered by longjmp.
-    add_definitions(-Wno-clobbered)
-  endif ()
+  #if (COMPILER_IS_GNU)
+  #  # disable -Wclobbered: it seems to be guessing incorrectly about a local
+  #  # variable being clobbered by longjmp.
+  #  add_definitions(-Wno-clobbered)
+  #endif ()
 
   if (NOT EMSCRIPTEN)
     # try to get the target architecture by compiling a dummy.c file and
