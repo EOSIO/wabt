@@ -141,8 +141,10 @@ void Destruct(T& placement) {
 }
 
 
+if __GNUC__ >= 7
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-truncation"
+#endif
 
 inline std::string WABT_PRINTF_FORMAT(1, 2)
     StringPrintf(const char* format, ...) {
@@ -160,7 +162,9 @@ inline std::string WABT_PRINTF_FORMAT(1, 2)
   return std::string(buffer.data(), len - 1);
 }
 
+if __GNUC__ >= 7
 #pragma GCC diagnostic pop
+#endif
 
 enum class LabelType {
   Func,
