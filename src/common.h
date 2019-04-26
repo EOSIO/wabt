@@ -140,6 +140,10 @@ void Destruct(T& placement) {
   placement.~T();
 }
 
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
+
 inline std::string WABT_PRINTF_FORMAT(1, 2)
     StringPrintf(const char* format, ...) {
   va_list args;
@@ -155,6 +159,8 @@ inline std::string WABT_PRINTF_FORMAT(1, 2)
   va_end(args_copy);
   return std::string(buffer.data(), len - 1);
 }
+
+#pragma GCC diagnostic pop
 
 enum class LabelType {
   Func,
