@@ -96,7 +96,7 @@ else ()
   #   interfaces, etc.
   # disable -Wpointer-arith: this is a GCC extension, and doesn't work in MSVC.
   add_definitions(
-    -Wall -Wextra -Werror -Wno-unused-parameter -Wpointer-arith -g
+    -Wall -Wextra -Wno-unused-parameter -Wpointer-arith -g
     -Wuninitialized
   )
 
@@ -260,7 +260,7 @@ add_library(wabt STATIC
   src/tracing.cc
   src/utf8.cc
 )
-install( TARGETS wabt 
+install( TARGETS wabt
    RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR}
    LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
    ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
