@@ -146,7 +146,9 @@ inline std::string WABT_PRINTF_FORMAT(1, 2)
   va_list args_copy;
   va_start(args, format);
   va_copy(args_copy, args);
-  size_t len = wabt_vsnprintf(nullptr, 0, format, args) + 1;  // For \0.
+  int res = wabt_vsnprintf(nullptr, 0, format, args);
+  if( res <= 0 ) return {}; // return empty string on error or if the format string is empty
+  size_t len =  res + 1;  // For \0.
   std::vector<char> buffer(len);
   va_end(args);
   wabt_vsnprintf(buffer.data(), len, format, args_copy);
