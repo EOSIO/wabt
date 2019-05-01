@@ -290,11 +290,30 @@ struct HostFunc : Func {
         field_name(field_name.to_string()),
         callback(callback) {}
 
+  using LightweightCallback = Result(*)(const HostFunc*,
+                                        const FuncSignature*,
+                                        const TypedValues& args,
+                                        TypedValues& results);
+  using LightweightContext = void*;
+
+  HostFunc(string_view module_name,
+           string_view field_name,
+           Index sig_index,
+           LightweightCallback callback,
+           LightweightContext context)
+      : Func(sig_index, true),
+        module_name(module_name.to_string()),
+        field_name(field_name.to_string()),
+        lw_callback(callback),
+        lw_context(context) {}
+
   static bool classof(const Func* func) { return func->is_host; }
 
   std::string module_name;
   std::string field_name;
   Callback callback;
+  LightweightCallback lw_callback = nullptr;
+  LightweightContext lw_context = nullptr;
 };
 
 struct Export {
@@ -363,6 +382,14 @@ struct HostModule : Module {
   std::pair<HostFunc*, Index> AppendFuncExport(string_view name,
                                                Index sig_index,
                                                HostFunc::Callback);
+  std::pair<HostFunc*, Index> AppendFuncExport(string_view name,
+                                               const FuncSignature&,
+                                               HostFunc::LightweightCallback,
+                                               HostFunc::LightweightContext);
+  std::pair<HostFunc*, Index> AppendFuncExport(string_view name,
+                                               Index sig_index,
+                                               HostFunc::LightweightCallback,
+                                               HostFunc::LightweightContext);
   std::pair<Table*, Index> AppendTableExport(string_view name, const Limits&);
   std::pair<Memory*, Index> AppendMemoryExport(string_view name, const Limits&);
   std::pair<Global*, Index> AppendGlobalExport(string_view name,

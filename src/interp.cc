@@ -274,6 +274,29 @@ std::pair<HostFunc*, Index> HostModule::AppendFuncExport(
   return {host_func, export_index};
 }
 
+std::pair<HostFunc*, Index> HostModule::AppendFuncExport(
+    string_view name,
+    const FuncSignature& sig,
+    HostFunc::LightweightCallback callback,
+    HostFunc::LightweightContext context) {
+  // TODO(binji): dedupe signature?
+  env_->EmplaceBackFuncSignature(sig);
+  Index sig_index = env_->GetFuncSignatureCount() - 1;
+  return AppendFuncExport(name, sig_index, callback, context);
+}
+
+std::pair<HostFunc*, Index> HostModule::AppendFuncExport(
+    string_view name,
+    Index sig_index,
+    HostFunc::LightweightCallback callback,
+    HostFunc::LightweightContext context) {
+  auto* host_func = new HostFunc(this->name, name, sig_index, callback, context);
+  env_->EmplaceBackFunc(host_func);
+  Index func_env_index = env_->GetFuncCount() - 1;
+  Index export_index = AppendExport(ExternalKind::Func, func_env_index, name);
+  return {host_func, export_index};
+}
+
 std::pair<Table*, Index> HostModule::AppendTableExport(string_view name,
                                                        const Limits& limits) {
   Table* table = env_->EmplaceBackTable(limits);
@@ -1569,7 +1592,9 @@ Result Thread::CallHost(HostFunc* func) {
     results[i].SetZero();
   }
 
-  Result call_result = func->callback(func, sig, params, results);
+  Result call_result = func->lw_callback
+    ? (func->lw_callback)(func, sig, params, results)
+    : func->callback(func, sig, params, results);
   TRAP_IF(call_result != Result::Ok, HostTrapped);
 
   TRAP_IF(results.size() != num_results, HostResultTypeMismatch);
