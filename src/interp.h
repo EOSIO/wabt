@@ -121,6 +121,43 @@ struct Table {
   std::vector<Index> func_indexes;
 };
 
+struct Memory_Data {
+   Memory_Data() {
+      _data = (char *)malloc(_capacity);
+   }
+   ~Memory_Data() {
+      free(_data);
+   }
+   void resize(size_t newsize) {
+      if (newsize > _capacity) {
+         do {
+            _capacity <<= 1;
+         } while (newsize > _capacity);
+         char *newdata = (char *)malloc(_capacity);
+         if (_len) {
+            memcpy(newdata, _data, _len);
+         }
+         memset(newdata + _len, 0, newsize - _len);
+         free(_data);
+         _data = newdata;
+      } else if (newsize > _len) {
+         memset(_data + _len, 0, newsize - _len);
+      }
+      _len = newsize;
+   }
+   size_t size() const { return _len; }
+   size_t capacity() const { return _capacity; }
+   char *data() { return _data; }
+   const char *data() const { return _data; }
+   char &operator[](size_t index) { return _data[index]; }
+   const char &operator[](size_t index) const { return _data[index]; }
+
+private:
+   char   *_data = nullptr;
+   size_t _len = 0;
+   size_t _capacity = 34 * 1024 * 1024;
+};
+
 struct Memory {
   Memory() = default;
   explicit Memory(const Limits& limits)
@@ -130,7 +167,7 @@ struct Memory {
       }
 
   Limits page_limits;
-  static std::vector<char> data;
+  static Memory_Data data;
 };
 
 // ValueTypeRep converts from one type to its representation on the
