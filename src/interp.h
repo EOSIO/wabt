@@ -121,53 +121,21 @@ struct Table {
   std::vector<Index> func_indexes;
 };
 
-struct Memory_Data {
-   Memory_Data() {
-      _data = (char *)malloc(_capacity);
-   }
-   ~Memory_Data() {
-      free(_data);
-   }
-   void resize(size_t newsize) {
-      if (newsize > _capacity) {
-         do {
-            _capacity <<= 1;
-         } while (newsize > _capacity);
-         char *newdata = (char *)malloc(_capacity);
-         if (_len) {
-            memcpy(newdata, _data, _len);
-         }
-         memset(newdata + _len, 0, newsize - _len);
-         free(_data);
-         _data = newdata;
-      } else if (newsize > _len) {
-         memset(_data + _len, 0, newsize - _len);
-      }
-      _len = newsize;
-   }
-   size_t size() const { return _len; }
-   size_t capacity() const { return _capacity; }
-   char *data() { return _data; }
-   const char *data() const { return _data; }
-   char &operator[](size_t index) { return _data[index]; }
-   const char &operator[](size_t index) const { return _data[index]; }
-
-private:
-   char   *_data = nullptr;
-   size_t _len = 0;
-   size_t _capacity = 34 * 1024 * 1024;
-};
 
 struct Memory {
   Memory() = default;
   explicit Memory(const Limits& limits)
       : page_limits(limits) {
+         const size_t init_capacity = 34 * 1024 * 1024;
+         if (data.capacity() < init_capacity) {
+            data.reserve(init_capacity);
+         }
          data.resize(limits.initial * WABT_PAGE_SIZE);
          memset(data.data(), 0, data.size());
       }
 
   Limits page_limits;
-  static Memory_Data data;
+  static std::string data;
 };
 
 // ValueTypeRep converts from one type to its representation on the
