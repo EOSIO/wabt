@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+/*
+ *
+ * This file has been modified by block.one
+ *
+ */
+
 #include "src/interp.h"
 
 #include <algorithm>
@@ -1540,8 +1546,18 @@ Result Thread::CallHost(HostFunc* func) {
 
   size_t num_params = sig->param_types.size();
   size_t num_results = sig->result_types.size();
-  TypedValues params(num_params);
-  TypedValues results(num_results);
+
+  static thread_local TypedValues params;
+  static thread_local TypedValues results;
+  static thread_local bool _init = false;
+  if (!_init) {
+    params.reserve(32);
+    results.reserve(32);
+    _init = true;
+  }
+
+  params.resize(num_params);
+  results.resize(num_results);
 
   for (size_t i = num_params; i > 0; --i) {
     params[i - 1].value = Pop();

@@ -14,6 +14,12 @@
 # limitations under the License.
 #
 
+#
+#
+# This file has been modified by block.one
+#
+#
+
 cmake_minimum_required(VERSION 2.6)
 project(WABT)
 
@@ -90,7 +96,7 @@ else ()
   #   interfaces, etc.
   # disable -Wpointer-arith: this is a GCC extension, and doesn't work in MSVC.
   add_definitions(
-    -Wall -Wextra -Werror -Wno-unused-parameter -Wpointer-arith -g
+    -Wall -Wextra -Wno-unused-parameter -Wpointer-arith -g
     -Wuninitialized
   )
 
@@ -111,11 +117,11 @@ else ()
     add_definitions(-D_POSIX)
   endif ()
 
-  if (COMPILER_IS_GNU)
-    # disable -Wclobbered: it seems to be guessing incorrectly about a local
-    # variable being clobbered by longjmp.
-    add_definitions(-Wno-clobbered)
-  endif ()
+  #if (COMPILER_IS_GNU)
+  #  # disable -Wclobbered: it seems to be guessing incorrectly about a local
+  #  # variable being clobbered by longjmp.
+  #  add_definitions(-Wno-clobbered)
+  #endif ()
 
   if (NOT EMSCRIPTEN)
     # try to get the target architecture by compiling a dummy.c file and
@@ -254,7 +260,7 @@ add_library(wabt STATIC
   src/tracing.cc
   src/utf8.cc
 )
-install( TARGETS wabt 
+install( TARGETS wabt
    RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR}
    LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
    ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
