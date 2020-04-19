@@ -36,7 +36,7 @@
 namespace wabt {
 namespace interp {
 
-std::vector<char> Memory::data;
+std::string Memory::data;
 std::vector<Value> Thread::value_stack_;
 
 // Differs from the normal CHECK_RESULT because this one is meant to return the
